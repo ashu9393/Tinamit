@@ -33,7 +33,7 @@ if len(para_instalar) > 0:
     utils.install_packages(StrVector(para_instalar))
 
 importr('deSolve')
-
+import re
 
 class ModeloStella(EnvolturaMDS):
 
@@ -66,17 +66,25 @@ class ModeloStella(EnvolturaMDS):
 
         unidades = []
         constantes = []
-        # las constantes, o parámetros los lee en: parms <- c()
+        temp_constantes = []
+        # las constantes, o parámetros los lee en: parms <- c() h
 
         niveles = []
+        temp_niveles = []
         # stocks están en la lista Y <- ()
 
         # Aquí puedes leer símismo.mod_txt para
         for line in símismo.mod_txt:
             if "parms <-" in line:
-                constantes.append(line)
+                temp_constantes.append(line)
+                temp_constantes.remove("parms <- c")
+                constantes = re.findall(r'([\w\_]+) = ([\d\.]+)', temp_constantes)
+                # en constantes hay una lista de tuples del nombre y valor de la constante, creo
             elif "Y <-" in line:
-                niveles.append(line)
+                temp_niveles.append(line)
+                temp_niveles.remove("Y <- c")
+                niveles = re.findall(r'([\w\_]+) = ([\d\.]+) { (\w) }', temp_niveles)
+                # en niveles hay una lista de tuples con el nombre, valor y dimensional de los niveles, creo
             else:
                 flujos.append(line)
 
