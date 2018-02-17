@@ -7,7 +7,6 @@ import csv
 import numpy as np
 
 from tinamit.Modelo import Modelo
-from .Stella import ModeloStella
 
 
 class EnvolturaMDS(Modelo):

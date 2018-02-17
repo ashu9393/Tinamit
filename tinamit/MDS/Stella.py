@@ -8,6 +8,7 @@ import os, site
 os.environ['R_USER'] = os.path.join(site.getsitepackages()[0], 'rpy2')
 
 import rpy2.robjects as robjects
+
 # encapsulación de paquetes de funciones de R en una forma amigable para Python
 from rpy2.robjects.vectors import DataFrame
 from rpy2.robjects.packages import importr, data
