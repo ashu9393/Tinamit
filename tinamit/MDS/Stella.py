@@ -3,6 +3,7 @@ from tinamit.MDS._StellaR import run as correr_stellar  # Importamos una copia l
 
 # Importamos todo al principio
 import os, site
+os.environ['R_HOME'] = 'C:\\Program Files\\R\\R-3.4.2'
 # os.environ['R_HOME'] = 'C:\Program Files\Microsoft\R Open\R-3.4.0'
 # Si tienes problemas, activar la línea arriba con tu instalación de R
 os.environ['R_USER'] = os.path.join(site.getsitepackages()[0], 'rpy2')
@@ -67,30 +68,26 @@ class ModeloStella(EnvolturaMDS):
 
         unidades = []
         constantes = []
-        temp_constantes = []
+        temp_constantes = ""
         # las constantes, o parámetros los lee en: parms <- c() h
 
         niveles = []
-        temp_niveles = []
+        temp_niveles = ""
         # stocks están en la lista Y <- ()
 
         # Aquí puedes leer símismo.mod_txt para
         for line in símismo.mod_txt:
             if "parms <-" in line:
-                temp_constantes.append(line)
-                temp_constantes.remove("parms <- c")
+                temp_constantes += str(line)
                 constantes = re.findall(r'([\w\_]+) = ([\d\.]+)', temp_constantes)
                 # en constantes hay una lista de tuples del nombre y valor de la constante, creo
             elif "Y <-" in line:
-                temp_niveles.append(line)
-                temp_niveles.remove("Y <- c")
+                temp_niveles += str(line)
                 niveles = re.findall(r'([\w\_]+) = ([\d\.]+) { (\w) }', temp_niveles)
                 # en niveles hay una lista de tuples con el nombre, valor y dimensional de los niveles, creo
             else:
                 flujos.append(line)
 
-        # también podrían leerse las líneas del modelo en R(que son variables, algunas repetidas) como objetos R,
-        # tal vez se pueden leer mejor
 
         pass
 
