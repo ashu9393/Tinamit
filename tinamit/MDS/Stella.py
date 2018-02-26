@@ -1,18 +1,17 @@
+# Importamos todo al principio
+import os
+import site
+
 from tinamit.MDS.MDS import EnvolturaMDS
 from tinamit.MDS._StellaR import run as correr_stellar  # Importamos una copia local de Stellar
 
-# Importamos todo al principio
-import os, site
-os.environ['R_HOME'] = 'C:\\Program Files\\R\\R-3.4.2'
+os.environ['R_HOME'] = 'C:\Program Files\R\R-3.4.3'
 # os.environ['R_HOME'] = 'C:\Program Files\Microsoft\R Open\R-3.4.0'
 # Si tienes problemas, activar la línea arriba con tu instalación de R
 os.environ['R_USER'] = os.path.join(site.getsitepackages()[0], 'rpy2')
 
-import rpy2.robjects as robjects
-
 # encapsulación de paquetes de funciones de R en una forma amigable para Python
-from rpy2.robjects.vectors import DataFrame
-from rpy2.robjects.packages import importr, data
+from rpy2.robjects.packages import importr
 from rpy2.robjects.vectors import StrVector
 
 # importar el módulo de paquetes de rpy2
@@ -36,6 +35,7 @@ if len(para_instalar) > 0:
 
 importr('deSolve')
 import re
+
 
 class ModeloStella(EnvolturaMDS):
 
@@ -68,28 +68,31 @@ class ModeloStella(EnvolturaMDS):
 
         unidades = []
         constantes = []
-        temp_constantes = ""
         # las constantes, o parámetros los lee en: parms <- c() h
 
         niveles = []
-        temp_niveles = ""
         # stocks están en la lista Y <- ()
 
+        # Yo recomendaría leer de la primera parte del archivo ("model<-function(...)").
         # Aquí puedes leer símismo.mod_txt para
-        for line in símismo.mod_txt:
-            if "parms <-" in line:
-                temp_constantes += str(line)
-                constantes = re.findall(r'([\w\_]+) = ([\d\.]+)', temp_constantes)
+        for lín in símismo.mod_txt:
+            if "<- parms" in lín:
+                nombre_var = lín.split('<-')[0].strip()
+                constantes.append(nombre_var)
+                # temp_constantes = str(lín)
+                # constantes = re.findall(r'([\w\_]+) = ([\d\.]+)', temp_constantes)
                 # en constantes hay una lista de tuples del nombre y valor de la constante, creo
-            elif "Y <-" in line:
-                temp_niveles += str(line)
-                niveles = re.findall(r'([\w\_]+) = ([\d\.]+) { (\w) }', temp_niveles)
+            elif " <- Y" in lín:
+                nombre_var = lín.split('<-')[0].strip()
+                niveles.append(nombre_var)
+                # niveles = re.findall(r'([\w\_]+) = ([\d\.]+) { (\w) }', temp_niveles)
                 # en niveles hay una lista de tuples con el nombre, valor y dimensional de los niveles, creo
-            else:
-                flujos.append(line)
+            elif '<-' in lín:
+                flujos.append(lín.split('<-')[0].strip())
 
-
-        pass
+        símismo.flujos = flujos
+        símismo.niveles = niveles
+        símismo.constantes = constantes
 
     def obt_unidad_tiempo(símismo):
         # obtener las unidades de tiempo
@@ -133,7 +136,4 @@ class ModeloStella(EnvolturaMDS):
     def cerrar_modelo(símismo):
         # cerrar la simulación
 
-
         pass
-
-
