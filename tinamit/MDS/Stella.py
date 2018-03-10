@@ -79,16 +79,14 @@ class ModeloStella(EnvolturaMDS):
             if "<- parms" in lín:
                 nombre_var = lín.split('<-')[0].strip()
                 constantes.append(nombre_var)
-                # temp_constantes = str(lín)
-                # constantes = re.findall(r'([\w\_]+) = ([\d\.]+)', temp_constantes)
-                # en constantes hay una lista de tuples del nombre y valor de la constante, creo
             elif " <- Y" in lín:
                 nombre_var = lín.split('<-')[0].strip()
                 niveles.append(nombre_var)
-                # niveles = re.findall(r'([\w\_]+) = ([\d\.]+) { (\w) }', temp_niveles)
-                # en niveles hay una lista de tuples con el nombre, valor y dimensional de los niveles, creo
             elif '<-' in lín:
                 flujos.append(lín.split('<-')[0].strip())
+            elif "}" in lín:
+                break
+
 
         símismo.flujos = flujos
         símismo.niveles = niveles
